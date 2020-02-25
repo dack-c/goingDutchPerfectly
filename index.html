@@ -46,7 +46,6 @@
         <span>
             <p id="result2" class="center"></p>
         </span>
-        
     </form>
 
     <script>
@@ -76,10 +75,10 @@
             //var childs = $('.pdInput').get();
             var childs = $('#pdInputGroup').children();
             var isOverlaps = new Array();
-            var resultStr1 = "";
-            var resultStr2 = "";
+            var resultStr1 = "";//계산한 사람 없는 줄 통합
+            var resultStr2 = "";//계산한 사람 있는 줄 통합
             var totalMoney;
-            var morePayNum;
+            var morePayNum;//더 많은 돈을 내야하는 사람의 숫자
             var calName;
             for(var step = 0; step < childLength; step++)
             {
@@ -148,17 +147,54 @@
                 }
                 //var names = $('.pdInputGroup').children().eq(0)
             }
-            
+
+            resultStr1 = (results1.length != 0) ? "(계산한 사람 X 경우)<br>" : "";
             for(var i = 0; i < results1.length; i++)
             {
                 resultStr1 += results1[i].name + ": " + String(results1[i].money) + "원 / ";
             }
+            resultStr2 = (results2.length != 0) ? "(계산한 사람 O 경우)<br>" : "";
             for(var i = 0; i < results2.length; i++)
             {
-                resultStr2 += "&quot;" + results2[i].dutchName + "&quot;" + "이(가) " + results2[i].calName + "에게 " + String(results2[i].money) + "원 줘야함.<br>";
+                resultStr2 += "&quot;" + results2[i].dutchName + "&quot;" + "이(가) " + "&quot;" + results2[i].calName + "&quot;" + "에게 " + String(results2[i].money) + "원 줘야함.<br>";
             }
             //contents.replaceAll("\n", "<br>");
             document.getElementById("result1").innerHTML = resultStr1;
+            document.getElementById("result2").innerHTML = resultStr2;
+
+
+            var minusMoney;
+            var deletionIndex;
+            var isCleanUp = false;
+            for(var i = 0; i < results2.length; i++)
+            {
+                for(var k = 0; k < results2.length; k++)
+                {
+                    if((results2[i].dutchName == results2[k].calName) && (results2[i].calName == results2[k].dutchName))
+                    {
+                        isCleanUp = true;
+                        if(results2[i].money > results2[k].money)
+                        {
+                            results2[i].money = results2[i].money - results2[k].money;
+                            results2.splice(k, 1);
+                        }
+                        else
+                        {
+                            results2[k].money = results2[k].money - results2[i].money;
+                            results2.splice(i, 1);
+                        }
+                    }
+                }
+            }
+            
+            if(isCleanUp == true)
+            {
+                resultStr2 += "정리하면,<br>";
+                for(var i = 0; i < results2.length; i++)
+                {
+                    resultStr2 += "&quot;" + results2[i].dutchName + "&quot;" + "이(가) " + "&quot;" + results2[i].calName + "&quot;" + "에게 " + String(results2[i].money) + "원 줘야함.<br>";
+                }
+            }
             document.getElementById("result2").innerHTML = resultStr2;
         })
     </script>
